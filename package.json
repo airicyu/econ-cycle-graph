@@ -2,6 +2,7 @@
   "name": "econ-cycle-graph",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://airicyu.github.io/econ-cycle-graph",
   "type": "module",
   "dependencies": {
     "@types/luxon": "^3.2.0",
