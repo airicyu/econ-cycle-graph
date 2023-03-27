@@ -5,13 +5,14 @@ import { data as usOutputGapRawData2 } from "./data/us_output_gap2.js";
 import {
   Chart as ChartJS,
   LinearScale,
+  CategoryScale,
   PointElement,
   LineElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
-import { Scatter } from "react-chartjs-2";
+import { Line, Scatter } from "react-chartjs-2";
 import { Table } from "antd";
 import Row from "antd/es/grid/row.js";
 import Col from "antd/es/grid/col.js";
@@ -386,6 +387,57 @@ export const DataInfoUS = (props: any) => {
               { title: "%", dataIndex: "value", key: "value" },
             ]}
           ></Table>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={10}>
+          <h2>US Core inflation rate</h2>
+          <Line
+            data={{
+              labels: coreInflationRateData
+                .slice(0, 48)
+                .map((_) => _.yearMonth)
+                .reverse(),
+              datasets: [
+                {
+                  label: "Core Inflation Rate",
+                  data: coreInflationRateData
+                    .slice(0, 48)
+                    .map((_) => _.value)
+                    .reverse(),
+                  showLine: true,
+                  borderColor: "rgb(255, 99, 132)",
+                  backgroundColor: "rgba(255, 99, 132, 0.5)",
+                },
+              ],
+            }}
+            options={{} as any}
+          />
+        </Col>
+        <Col span={1}></Col>
+        <Col span={10}>
+          <h2>US output gap</h2>
+          <Line
+            data={{
+              labels: outputGapData
+                .slice(0, 48)
+                .map((_) => _.yearMonth)
+                .reverse(),
+              datasets: [
+                {
+                  label: "Output Gap",
+                  data: outputGapData
+                    .slice(0, 48)
+                    .map((_) => _.value)
+                    .reverse(),
+                  showLine: true,
+                  borderColor: "rgb(255, 99, 132)",
+                  backgroundColor: "rgba(255, 99, 132, 0.5)",
+                },
+              ],
+            }}
+            options={{} as any}
+          />
         </Col>
       </Row>
     </div>

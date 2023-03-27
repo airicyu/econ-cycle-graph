@@ -1,15 +1,16 @@
 import { data as cnCoreInflationRateRawData } from "./data/china_core_inflation_rate";
-import { data as cnOutputGapRawData } from "./data/cn_output_gap";
+import { data as cnOutputRawData } from "./data/cn_output";
 import {
   Chart as ChartJS,
   LinearScale,
+  CategoryScale,
   PointElement,
   LineElement,
   Title,
   Tooltip,
   Legend,
 } from "chart.js";
-import { Scatter } from "react-chartjs-2";
+import { Line, Scatter } from "react-chartjs-2";
 import { Table } from "antd";
 import Row from "antd/es/grid/row.js";
 import Col from "antd/es/grid/col.js";
@@ -17,6 +18,7 @@ import { useState } from "react";
 
 ChartJS.register(
   LinearScale,
+  CategoryScale,
   PointElement,
   LineElement,
   Title,
@@ -60,20 +62,39 @@ const parseCoreInflationRateRawData = (data: string[][]) => {
  * @param data
  * @returns
  */
-const parseOutputGapRawData = (data: string[][]) => {
+const parseOutputRawData = (data: string[][]) => {
   const yearDataRows = data;
   return yearDataRows
     .map((row) => {
-      const year = +row[0].substring(0, 4);
-      const month = +row[0].substring(5, 7);
+      return {
+        yearMonth: row[0].substring(0, 7),
+        value: +row[1],
+      };
+    })
+    .sort((a, b) => {
+      if (a.yearMonth < b.yearMonth) {
+        return 1;
+      } else if (a.yearMonth > b.yearMonth) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+};
+const parseOutputGapData = (data: { yearMonth: string; value: number }[]) => {
+  const yearDataRows = data;
+  return yearDataRows
+    .map((row) => {
+      const year = +row.yearMonth.substring(0, 4);
+      const month = +row.yearMonth.substring(5, 7);
       const gap =
-        +row[1] -
+        +row.value -
         (100 +
           ((127 - 100) / (2024 * 12 + 6 - (2019 * 12 + 12))) *
             (year * 12 + month - (2019 * 12 + 12)));
 
       return {
-        yearMonth: row[0].substring(0, 7),
+        yearMonth: row.yearMonth,
         value: gap,
       };
     })
@@ -185,7 +206,8 @@ export const DataInfoCN = (props: any) => {
   );
 
   // -4, 0, 4
-  const outputGapDataRaw = parseOutputGapRawData(cnOutputGapRawData);
+  const outputData = parseOutputRawData(cnOutputRawData);
+  const outputGapDataRaw = parseOutputGapData(outputData);
   const outputGapData = fillOutputGapDataGap(
     outputGapDataRaw,
     coreInflationRateData[0].yearMonth
@@ -350,6 +372,62 @@ export const DataInfoCN = (props: any) => {
               { title: "%", dataIndex: "value", key: "value" },
             ]}
           ></Table>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={10}>
+          <h2>CN Core inflation rate</h2>
+          <Line
+            data={{
+              labels: coreInflationRateData
+                .slice(0, 48)
+                .map((_) => _.yearMonth)
+                .reverse(),
+              datasets: [
+                {
+                  label: "Core Inflation Rate",
+                  data: coreInflationRateData
+                    .slice(0, 48)
+                    .map((_) => _.value)
+                    .reverse(),
+                  showLine: true,
+                  borderColor: "rgb(255, 99, 132)",
+                  backgroundColor: "rgba(255, 99, 132, 0.5)",
+                },
+              ],
+            }}
+            options={{} as any}
+          />
+        </Col>
+        <Col span={1}></Col>
+        <Col span={10}>
+          <h2>Estimated CN output gap</h2>
+          <Line
+            data={{
+              labels: outputData.map((_) => _.yearMonth).reverse(),
+              datasets: [
+                {
+                  label: "Output Potential",
+                  data: outputData.map(
+                    (_, i) =>
+                      100 +
+                      ((127 - 100) / (2024 * 12 + 6 - (2019 * 12 + 12))) * i * 3
+                  ),
+                  showLine: true,
+                  borderColor: "rgb(155, 99, 182)",
+                  backgroundColor: "rgba(155, 99, 182, 0.5)",
+                },
+                {
+                  label: "Output",
+                  data: outputData.map((_) => _.value).reverse(),
+                  showLine: true,
+                  borderColor: "rgb(255, 99, 132)",
+                  backgroundColor: "rgba(255, 99, 132, 0.5)",
+                },
+              ],
+            }}
+            options={{} as any}
+          />
         </Col>
       </Row>
     </div>
