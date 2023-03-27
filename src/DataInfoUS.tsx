@@ -212,8 +212,8 @@ const fillOutputGapDataGap = (
 };
 
 export const DataInfoUS = (props: any) => {
-  // only show last 48 data points
-  const [showLastNData, setShowLastNData] = useState(48);
+  // only show last 24 data points
+  const [showLastNData, setShowLastNData] = useState(24);
 
   // -2, 2, 6
   const coreInflationRateData = parseCoreInflationRateRawData(
@@ -350,7 +350,7 @@ export const DataInfoUS = (props: any) => {
           <input
             value={showLastNData}
             onChange={(e) => {
-              setShowLastNData(+e.target.value ?? 48);
+              setShowLastNData(+e.target.value ?? 24);
             }}
           ></input>{" "}
           month
